@@ -708,7 +708,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 const form = ref({
   inputDirectory: 'tapis://designsafe.storage.default/kks32/mpm-benchmarks/2d/uniaxial_stress',
   inputScript: '',
-  allocation: '',
+  allocation: 'ASC25049',
   queue: 'skx-dev',
   maxRuntime: 120,
   nodeCount: 1,
