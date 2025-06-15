@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="mpm-form">
     <!-- Main Content Row -->
-    <v-row class="main-row">
+    <v-row class="main-row" no-gutters>
       <!-- Left Sidebar Navigation -->
       <v-col cols="2" class="sidebar">
         <div class="nav-section">
@@ -20,7 +20,7 @@
       </v-col>
 
       <!-- Main Form Content with Sticky Header -->
-      <v-col cols="7" class="form-content">
+      <v-col :cols="summaryExpanded ? 7 : 9" class="form-content">
         <!-- Sticky Form Header -->
         <div class="form-header-sticky">
           <!-- Form Title and Controls -->
@@ -53,8 +53,8 @@
                   </v-btn-toggle>
                   
                   <v-btn 
-                    v-if="isFormValid"
                     color="success" 
+                    :disabled="!isFormValid"
                     @click="submitJob"
                     class="submit-btn"
                     size="large"
@@ -89,20 +89,6 @@
                     >
                       {{ step.completed.value ? 'mdi-check' : step.icon }}
                     </v-icon>
-                    <!-- Required indicator for incomplete required steps -->
-                    <div 
-                      v-if="!step.completed.value && step.required"
-                      class="required-indicator"
-                    >
-                      !
-                    </div>
-                    <!-- Checkmark for completed steps -->
-                    <div 
-                      v-if="step.completed.value"
-                      class="completed-indicator"
-                    >
-                      ✓
-                    </div>
                   </div>
                   <div class="step-content">
                     <div class="step-title">{{ step.title }}</div>
@@ -130,27 +116,32 @@
             <v-card 
               :id="'section-inputs'"
               class="form-section"
-              :class="{ 'section-completed': !!form.inputDirectory }"
               elevation="1"
             >
               <v-card-title class="section-header">
-                <v-icon 
-                  :color="!!form.inputDirectory ? 'success' : 'primary'"
-                  class="section-icon"
-                >
-                  {{ !!form.inputDirectory ? 'mdi-check-circle' : 'mdi-folder' }}
-                </v-icon>
+                <v-icon class="section-icon" color="primary">mdi-folder</v-icon>
                 <div class="section-title-content">
-                  <h3>Input Directory</h3>
+                  <h3>
+                    Input Directory
+                    <v-icon 
+                      v-if="!!form.inputDirectory" 
+                      color="success" 
+                      size="small"
+                      class="ml-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                    <v-icon 
+                      v-else 
+                      color="error" 
+                      size="small"
+                      class="ml-2"
+                    >
+                      mdi-alert-circle
+                    </v-icon>
+                  </h3>
                   <p class="section-subtitle">Select the directory containing your MPM input files</p>
                 </div>
-                <v-chip 
-                  :color="!!form.inputDirectory ? 'success' : 'error'" 
-                  variant="tonal" 
-                  size="small"
-                >
-                  {{ !!form.inputDirectory ? 'Complete' : 'Required' }}
-                </v-chip>
               </v-card-title>
               
               <v-card-text>
@@ -192,27 +183,32 @@
             <v-card 
               :id="'section-parameters'"
               class="form-section"
-              :class="{ 'section-completed': !!form.inputScript }"
               elevation="1"
             >
               <v-card-title class="section-header">
-                <v-icon 
-                  :color="!!form.inputScript ? 'success' : 'primary'"
-                  class="section-icon"
-                >
-                  {{ !!form.inputScript ? 'mdi-check-circle' : 'mdi-file-code' }}
-                </v-icon>
+                <v-icon class="section-icon" color="primary">mdi-file-code</v-icon>
                 <div class="section-title-content">
-                  <h3>Input Script <span class="required-label">(appArgs)</span></h3>
+                  <h3>
+                    Input Script <span class="required-label">(appArgs)</span>
+                    <v-icon 
+                      v-if="!!form.inputScript" 
+                      color="success" 
+                      size="small"
+                      class="ml-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                    <v-icon 
+                      v-else 
+                      color="error" 
+                      size="small"
+                      class="ml-2"
+                    >
+                      mdi-alert-circle
+                    </v-icon>
+                  </h3>
                   <p class="section-subtitle">Specify the input file name for your MPM simulation</p>
                 </div>
-                <v-chip 
-                  :color="!!form.inputScript ? 'success' : 'error'" 
-                  variant="tonal" 
-                  size="small"
-                >
-                  {{ !!form.inputScript ? 'Complete' : 'Required' }}
-                </v-chip>
               </v-card-title>
               
               <v-card-text>
@@ -244,27 +240,24 @@
             <v-card 
               :id="'section-configuration'"
               class="form-section"
-              :class="{ 'section-completed': hasConfigurationData }"
               elevation="1"
             >
               <v-card-title class="section-header">
-                <v-icon 
-                  :color="hasConfigurationData ? 'success' : 'grey'"
-                  class="section-icon"
-                >
-                  {{ hasConfigurationData ? 'mdi-check-circle' : 'mdi-cog' }}
-                </v-icon>
+                <v-icon class="section-icon" color="grey">mdi-cog</v-icon>
                 <div class="section-title-content">
-                  <h3>Job Configuration</h3>
+                  <h3>
+                    Job Configuration
+                    <v-icon 
+                      v-if="hasConfigurationData" 
+                      color="success" 
+                      size="small"
+                      class="ml-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                  </h3>
                   <p class="section-subtitle">Configure computational resources for your job</p>
                 </div>
-                <v-chip 
-                  :color="hasConfigurationData ? 'success' : 'grey'" 
-                  variant="flat" 
-                  size="small"
-                >
-                  {{ hasConfigurationData ? 'Complete' : 'Optional' }}
-                </v-chip>
               </v-card-title>
               
               <v-card-text>
@@ -390,27 +383,24 @@
             <v-card 
               :id="'section-outputs'"
               class="form-section"
-              :class="{ 'section-completed': hasOutputsData }"
               elevation="1"
             >
               <v-card-title class="section-header">
-                <v-icon 
-                  :color="hasOutputsData ? 'success' : 'grey'"
-                  class="section-icon"
-                >
-                  {{ hasOutputsData ? 'mdi-check-circle' : 'mdi-archive' }}
-                </v-icon>
+                <v-icon class="section-icon" color="grey">mdi-archive</v-icon>
                 <div class="section-title-content">
-                  <h3>Output Configuration</h3>
+                  <h3>
+                    Output Configuration
+                    <v-icon 
+                      v-if="hasOutputsData" 
+                      color="success" 
+                      size="small"
+                      class="ml-2"
+                    >
+                      mdi-check-circle
+                    </v-icon>
+                  </h3>
                   <p class="section-subtitle">Configure how your job results will be stored</p>
                 </div>
-                <v-chip 
-                  :color="hasOutputsData ? 'success' : 'grey'" 
-                  variant="flat" 
-                  size="small"
-                >
-                  {{ hasOutputsData ? 'Complete' : 'Optional' }}
-                </v-chip>
               </v-card-title>
               
               <v-card-text>
@@ -563,22 +553,49 @@
       </v-col>
 
       <!-- Right Summary Panel -->
-      <v-col cols="3" class="summary-panel">
-        <div class="summary-card">
+      <v-col :cols="summaryExpanded ? 3 : 'auto'" class="summary-panel">
+        <!-- Summary Toggle Button -->
+        <div v-if="!summaryExpanded" class="summary-toggle-collapsed">
+          <v-btn
+            @click="toggleSummary"
+            variant="tonal"
+            color="primary"
+            class="summary-expand-btn"
+            icon
+          >
+            <v-icon>mdi-menu-open</v-icon>
+          </v-btn>
+          <div class="summary-label-vertical">Summary</div>
+        </div>
+        
+        <!-- Expanded Summary Panel -->
+        <div v-if="summaryExpanded" class="summary-card">
           <div class="summary-header">
             <h3>Summary</h3>
-            <v-btn 
-              variant="outlined" 
-              size="small"
-              @click="generateJsonFromForm"
-              :disabled="!hasAnyData"
-            >
-              <v-icon left>mdi-refresh</v-icon>
-              Refresh
-            </v-btn>
+            <div class="summary-header-actions">
+              <v-btn 
+                variant="outlined" 
+                size="small"
+                @click="generateJsonFromForm"
+                :disabled="!hasAnyData"
+                class="mr-2"
+              >
+                <v-icon left>mdi-refresh</v-icon>
+                Refresh
+              </v-btn>
+              <v-btn
+                @click="toggleSummary"
+                variant="text"
+                size="small"
+                icon
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </div>
           </div>
 
-          <!-- Inputs Summary -->
+          <div class="summary-content">
+            <!-- Inputs Summary -->
           <div class="summary-section" v-if="form.inputDirectory">
             <div class="section-header">
               <h4>Inputs</h4>
@@ -677,6 +694,7 @@
               <span class="value">{{ form.archiveDirectory }}</span>
             </div>
           </div>
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -704,6 +722,7 @@ const activeSection = ref('inputs')
 const viewMode = ref('guided')
 const jsonConfig = ref('')
 const jsonError = ref('')
+const summaryExpanded = ref(false)
 
 // Step definitions for progress bar
 const steps = ref([
@@ -774,12 +793,17 @@ const jsonRules = [
 
 // Computed properties
 const hasConfigurationData = computed(() => {
-  return form.value.allocation || form.value.queue || form.value.maxRuntime || 
-         form.value.nodeCount || form.value.coresPerNode
+  return (form.value.allocation && form.value.allocation.trim() !== '') || 
+         (form.value.queue && form.value.queue.trim() !== '') || 
+         (form.value.maxRuntime && form.value.maxRuntime > 0) || 
+         (form.value.nodeCount && form.value.nodeCount > 0) || 
+         (form.value.coresPerNode && form.value.coresPerNode > 0)
 })
 
 const hasOutputsData = computed(() => {
-  return form.value.jobName || form.value.archiveSystem || form.value.archiveDirectory
+  return (form.value.jobName && form.value.jobName.trim() !== '') || 
+         (form.value.archiveSystem && form.value.archiveSystem.trim() !== '') || 
+         (form.value.archiveDirectory && form.value.archiveDirectory.trim() !== '')
 })
 
 const hasAnyData = computed(() => {
@@ -787,7 +811,14 @@ const hasAnyData = computed(() => {
 })
 
 const isFormValid = computed(() => {
-  return form.value.inputDirectory && form.value.inputScript
+  // Check required fields
+  const hasInputDirectory = !!form.value.inputDirectory
+  const hasInputScript = !!form.value.inputScript && form.value.inputScript.trim() !== ''
+  
+  // Validate input script format
+  const isInputScriptValid = hasInputScript && form.value.inputScript.endsWith('.json')
+  
+  return hasInputDirectory && isInputScriptValid
 })
 
 const isValidJson = computed(() => {
@@ -856,6 +887,10 @@ const editSection = (sectionId) => {
   setTimeout(() => {
     scrollToSection(sectionId)
   }, 100)
+}
+
+const toggleSummary = () => {
+  summaryExpanded.value = !summaryExpanded.value
 }
 
 const generateJsonFromForm = () => {
@@ -998,19 +1033,22 @@ onUnmounted(() => {
 .mpm-form {
   font-family: 'Roboto', sans-serif;
   background-color: #f5f5f5;
-  min-height: 100vh;
+  height: 100vh;
   padding: 0;
+  overflow: hidden;
 }
 
 .main-row {
   margin: 0;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .sidebar {
   background: #f8f9fa;
   border-right: 1px solid #e0e0e0;
   padding: 1rem;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .nav-section {
@@ -1159,41 +1197,6 @@ onUnmounted(() => {
   border-color: #1976d2;
 }
 
-.required-indicator {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 16px;
-  height: 16px;
-  background: #f44336;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.completed-indicator {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 16px;
-  height: 16px;
-  background: #4caf50;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
 
 .step-content {
   flex: 1;
@@ -1248,11 +1251,6 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.form-section.section-completed {
-  border-color: #e8f5e8;
-  background: #fefffe;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);
-}
 
 .section-header {
   display: flex;
@@ -1346,7 +1344,29 @@ onUnmounted(() => {
 .summary-panel {
   padding: 1rem;
   height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.summary-toggle-collapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
+.summary-expand-btn {
+  margin-bottom: 1rem;
+}
+
+.summary-label-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
 }
 
 .summary-card {
@@ -1354,8 +1374,10 @@ onUnmounted(() => {
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  height: 100%;
+  height: calc(100vh - 2rem);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .summary-header {
@@ -1363,6 +1385,17 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-shrink: 0;
+}
+
+.summary-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.summary-header-actions {
+  display: flex;
+  align-items: center;
 }
 
 .summary-header h3 {

@@ -9,6 +9,7 @@ export default defineConfig({
       autoImport: true,
     }),
   ],
+  base: process.env.NODE_ENV === 'production' ? '/mpm/' : '/',
   server: {
     port: 3000,
     host: true
