@@ -25,7 +25,7 @@
         <div class="form-header-sticky">
           <!-- Form Title and Controls -->
           <v-card class="form-controls-bar" elevation="1">
-            <v-container fluid>
+            <v-container fluid class="py-2">
               <v-row align="center" no-gutters>
                 <v-col class="text-center">
                   <div class="form-header">
@@ -89,6 +89,20 @@
                     >
                       {{ step.completed.value ? 'mdi-check' : step.icon }}
                     </v-icon>
+                    <!-- Required indicator for incomplete required steps -->
+                    <div 
+                      v-if="!step.completed.value && step.required"
+                      class="required-indicator"
+                    >
+                      !
+                    </div>
+                    <!-- Checkmark for completed steps -->
+                    <div 
+                      v-if="step.completed.value"
+                      class="completed-indicator"
+                    >
+                      ✓
+                    </div>
                   </div>
                   <div class="step-content">
                     <div class="step-title">{{ step.title }}</div>
@@ -116,26 +130,26 @@
             <v-card 
               :id="'section-inputs'"
               class="form-section"
-              :class="{ 'section-completed': form.inputDirectory }"
+              :class="{ 'section-completed': !!form.inputDirectory }"
               elevation="1"
             >
               <v-card-title class="section-header">
                 <v-icon 
-                  :color="form.inputDirectory ? 'success' : 'primary'"
+                  :color="!!form.inputDirectory ? 'success' : 'primary'"
                   class="section-icon"
                 >
-                  {{ form.inputDirectory ? 'mdi-check-circle' : 'mdi-folder' }}
+                  {{ !!form.inputDirectory ? 'mdi-check-circle' : 'mdi-folder' }}
                 </v-icon>
                 <div class="section-title-content">
                   <h3>Input Directory</h3>
                   <p class="section-subtitle">Select the directory containing your MPM input files</p>
                 </div>
                 <v-chip 
-                  :color="form.inputDirectory ? 'success' : 'error'" 
-                  variant="flat" 
+                  :color="!!form.inputDirectory ? 'success' : 'error'" 
+                  variant="tonal" 
                   size="small"
                 >
-                  {{ form.inputDirectory ? 'Complete' : 'Required' }}
+                  {{ !!form.inputDirectory ? 'Complete' : 'Required' }}
                 </v-chip>
               </v-card-title>
               
@@ -178,26 +192,26 @@
             <v-card 
               :id="'section-parameters'"
               class="form-section"
-              :class="{ 'section-completed': form.inputScript }"
+              :class="{ 'section-completed': !!form.inputScript }"
               elevation="1"
             >
               <v-card-title class="section-header">
                 <v-icon 
-                  :color="form.inputScript ? 'success' : 'primary'"
+                  :color="!!form.inputScript ? 'success' : 'primary'"
                   class="section-icon"
                 >
-                  {{ form.inputScript ? 'mdi-check-circle' : 'mdi-file-code' }}
+                  {{ !!form.inputScript ? 'mdi-check-circle' : 'mdi-file-code' }}
                 </v-icon>
                 <div class="section-title-content">
                   <h3>Input Script <span class="required-label">(appArgs)</span></h3>
                   <p class="section-subtitle">Specify the input file name for your MPM simulation</p>
                 </div>
                 <v-chip 
-                  :color="form.inputScript ? 'success' : 'error'" 
-                  variant="flat" 
+                  :color="!!form.inputScript ? 'success' : 'error'" 
+                  variant="tonal" 
                   size="small"
                 >
-                  {{ form.inputScript ? 'Complete' : 'Required' }}
+                  {{ !!form.inputScript ? 'Complete' : 'Required' }}
                 </v-chip>
               </v-card-title>
               
@@ -698,6 +712,7 @@ const steps = ref([
     title: 'Input Directory',
     subtitle: 'Select input files',
     icon: 'mdi-folder',
+    required: true,
     completed: computed(() => !!form.value.inputDirectory)
   },
   {
@@ -705,6 +720,7 @@ const steps = ref([
     title: 'Input Script',
     subtitle: 'Specify simulation file',
     icon: 'mdi-file-code',
+    required: true,
     completed: computed(() => !!form.value.inputScript)
   },
   {
@@ -712,6 +728,7 @@ const steps = ref([
     title: 'Job Configuration',
     subtitle: 'Set resources',
     icon: 'mdi-cog',
+    required: false,
     completed: computed(() => hasConfigurationData.value)
   },
   {
@@ -719,6 +736,7 @@ const steps = ref([
     title: 'Output Settings',
     subtitle: 'Name and storage',
     icon: 'mdi-archive',
+    required: false,
     completed: computed(() => hasOutputsData.value)
   }
 ])
@@ -808,14 +826,26 @@ const scrollToSection = (sectionId) => {
   const element = document.getElementById(`section-${sectionId}`)
   if (element) {
     const container = document.querySelector('.scrollable-content')
-    const headerHeight = document.querySelector('.form-header-sticky').offsetHeight
-    const elementTop = element.offsetTop - headerHeight - 20
-    
-    container.scrollTo({
-      top: elementTop,
-      behavior: 'smooth'
-    })
-    activeSection.value = sectionId
+    if (container) {
+      // Get the sticky header height
+      const stickyHeader = document.querySelector('.form-header-sticky')
+      const headerHeight = stickyHeader ? stickyHeader.offsetHeight : 0
+      
+      // Calculate element position relative to the scrollable container
+      const containerRect = container.getBoundingClientRect()
+      const elementRect = element.getBoundingClientRect()
+      const currentScroll = container.scrollTop
+      
+      // Calculate target scroll position
+      const targetScroll = currentScroll + (elementRect.top - containerRect.top) - 20
+      
+      container.scrollTo({
+        top: Math.max(0, targetScroll),
+        behavior: 'smooth'
+      })
+      
+      activeSection.value = sectionId
+    }
   }
 }
 
@@ -842,11 +872,7 @@ const generateJsonFromForm = () => {
     archiveDirectory: form.value.archiveDirectory || null
   }
   
-  const cleanConfig = Object.fromEntries(
-    Object.entries(jobConfig).filter(([_, v]) => v !== null && v !== '')
-  )
-  
-  jsonConfig.value = JSON.stringify(cleanConfig, null, 2)
+  jsonConfig.value = JSON.stringify(jobConfig, null, 2)
   jsonError.value = ''
 }
 
@@ -867,7 +893,20 @@ const applyJsonToForm = () => {
 }
 
 const resetJson = () => {
-  jsonConfig.value = ''
+  const defaultConfig = {
+    inputDirectory: null,
+    inputScript: null,
+    allocation: null,
+    queue: null,
+    maxRuntime: null,
+    nodeCount: null,
+    coresPerNode: null,
+    jobName: null,
+    archiveSystem: null,
+    archiveDirectory: null
+  }
+  
+  jsonConfig.value = JSON.stringify(defaultConfig, null, 2)
   jsonError.value = ''
 }
 
@@ -1044,7 +1083,7 @@ onUnmounted(() => {
 }
 
 .form-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #333;
 }
@@ -1097,6 +1136,7 @@ onUnmounted(() => {
   border: 2px solid #e0e0e0;
   margin-right: 0.75rem;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .progress-step.active .step-indicator {
@@ -1107,6 +1147,52 @@ onUnmounted(() => {
 .progress-step.completed .step-indicator {
   background: #4caf50;
   border-color: #4caf50;
+}
+
+.progress-step:not(.completed) .step-indicator {
+  background: #f5f5f5;
+  border-color: #e0e0e0;
+}
+
+.progress-step:not(.completed).active .step-indicator {
+  background: #e3f2fd;
+  border-color: #1976d2;
+}
+
+.required-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: #f44336;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.completed-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .step-content {
@@ -1163,8 +1249,9 @@ onUnmounted(() => {
 }
 
 .form-section.section-completed {
-  border-color: #4caf50;
-  background: linear-gradient(135deg, #f8fff8 0%, #ffffff 100%);
+  border-color: #e8f5e8;
+  background: #fefffe;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);
 }
 
 .section-header {
@@ -1258,9 +1345,7 @@ onUnmounted(() => {
 
 .summary-panel {
   padding: 1rem;
-  position: sticky;
-  top: 60px;
-  height: calc(100vh - 80px);
+  height: 100vh;
   overflow-y: auto;
 }
 
@@ -1269,6 +1354,8 @@ onUnmounted(() => {
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  height: 100%;
+  overflow-y: auto;
 }
 
 .summary-header {
