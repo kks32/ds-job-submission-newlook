@@ -3,19 +3,13 @@
     <!-- DesignSafe Header -->
     <v-app-bar app color="white" elevation="1" height="80">
       <v-container fluid class="d-flex align-center pa-0">
-        <!-- Left side: NSF Logo and DesignSafe branding -->
+        <!-- Left side: NSF Logo -->
         <div class="d-flex align-center">
           <img 
             src="/logo.png" 
             alt="NSF DesignSafe Logo" 
             class="logo-img"
           />
-          <div class="branding-text ml-3">
-            <div class="nsf-text">NSF NHERI</div>
-            <div class="designsafe-text">
-              <span class="design-text">DESIGN</span><span class="safe-text">SAFE</span>
-            </div>
-          </div>
         </div>
 
         <v-spacer></v-spacer>
@@ -94,22 +88,6 @@
       </v-container>
     </v-app-bar>
 
-
-    <!-- Warning Banner -->
-    <v-banner color="warning" icon="mdi-alert" class="warning-banner" style="margin-top: 130px;">
-      <template v-slot:text>
-        <strong>TACC Maintenance Outage: June 17-19</strong> — The 
-        <strong style="color: #d32f2f;">$WORK</strong> filesystem will be unavailable. Apps, Jobs & Jupyter Notebooks may be impacted during this time. To run jobs migrate 
-        <span style="color: #d32f2f;">×</span> data to 
-        <strong style="color: #d32f2f;">$SCRATCH</strong> and update job scripts. Account management will not work during this time. For updates, read further and subscribe to updates at 
-        <a href="#" class="text-primary">TACC User News</a>.
-      </template>
-      <template v-slot:actions>
-        <v-btn icon size="small">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </template>
-    </v-banner>
 
     <!-- Breadcrumb Navigation -->
     <v-container fluid class="breadcrumb-section">
@@ -197,39 +175,16 @@ const breadcrumbItems = [
   padding: 8px 16px;
 }
 
-.branding-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.nsf-text {
-  font-size: 12px;
-  color: #666;
-  font-weight: 500;
-  line-height: 1;
-}
-
-.designsafe-text {
-  font-size: 28px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.design-text {
-  color: #d32f2f;
-}
-
-.safe-text {
-  color: #666;
-}
-
-.warning-banner {
-  border-left: 4px solid #ff9800;
+.breadcrumb-section {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 8px 16px;
+  margin-top: 0;
 }
 
 .main-content {
   background: #f5f5f5;
-  min-height: calc(100vh - 260px);
+  min-height: calc(100vh - 140px);
 }
 
 /* Global app styles */

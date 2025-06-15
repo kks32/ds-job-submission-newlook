@@ -35,6 +35,27 @@
       <!-- Main Form Content -->
       <v-col cols="7" class="main-content">
         <v-stepper v-model="currentStep" class="elevation-0">
+          <!-- Navigation Buttons at Top -->
+          <div class="top-navigation">
+            <v-btn 
+              variant="outlined" 
+              @click="prevStep"
+              :disabled="currentStep === 1"
+              class="nav-btn"
+            >
+              Back
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn 
+              color="primary" 
+              @click="nextStep"
+              :disabled="currentStep === 4"
+              class="nav-btn"
+            >
+              Continue
+            </v-btn>
+          </div>
+          
           <v-stepper-header>
             <v-stepper-item 
               :complete="currentStep > 1" 
@@ -336,27 +357,26 @@
             </v-stepper-window-item>
           </v-stepper-window>
 
-          <!-- Navigation Buttons -->
-          <v-stepper-actions>
-            <template v-slot:prev>
-              <v-btn 
-                variant="outlined" 
-                @click="prevStep"
-                :disabled="currentStep === 1"
-              >
-                Back
-              </v-btn>
-            </template>
-            <template v-slot:next>
-              <v-btn 
-                color="primary" 
-                @click="nextStep"
-                :disabled="currentStep === 4"
-              >
-                Continue
-              </v-btn>
-            </template>
-          </v-stepper-actions>
+          <!-- Navigation Buttons at Bottom (duplicate for convenience) -->
+          <div class="bottom-navigation">
+            <v-btn 
+              variant="outlined" 
+              @click="prevStep"
+              :disabled="currentStep === 1"
+              class="nav-btn"
+            >
+              Back
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn 
+              color="primary" 
+              @click="nextStep"
+              :disabled="currentStep === 4"
+              class="nav-btn"
+            >
+              Continue
+            </v-btn>
+          </div>
         </v-stepper>
       </v-col>
 
@@ -766,6 +786,27 @@ const submitJob = () => {
 
 .v-text-field {
   margin-bottom: 0.5rem;
+}
+
+.top-navigation {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 1rem;
+}
+
+.bottom-navigation {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 1rem;
+}
+
+.nav-btn {
+  text-transform: none;
+  font-weight: 500;
 }
 
 .v-btn {
